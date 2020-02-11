@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from math import hypot
 from typing import NamedTuple
-from enum import Enum
+from dataclasses import dataclass
 import numpy as np
-import lazy
+# from lazy import *
+
 
 # make a word class
 # has a syllabify function
 
 # Enumeration of
 class Place(Enum):
-    Bilabial = 1
-    Labial = 2
-    Dental = 3
-    Alveolar = 4
+    Bilabial = 0
+    Labial = 1
+    Dental = 2
+    Alveolar = 3
+    PostAlveolar = 4
     Retroflex = 5
     Palatal = 6
     Velar = 7
@@ -29,60 +32,62 @@ class Manner(Enum):
     10 : Vowels   11 : Approximants  12 : Semivowels  13 : Rhotics 14 : Laterals
     15 : Liquids  16 : Vibrants      17 : Flaps       18 : Trills
     """
-    Occlusive = np.array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Nasal = np.array([0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Plosive = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Affricate = np.array([0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Strident = np.array([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Sibilant = np.array([0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Obstruent = np.array([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Fricative = np.array([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Continuant = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Vocoid = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    Vowel = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
-    Approximant = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
-    Semivowel = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0])
-    Rhotic = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
-    Lateral = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
-    Liquid = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
-    Vibrant = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
-    Flap = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
-    Trill = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+    Occlusive = 0
+    Nasal = 1
+    Plosive = 2
+    Affricate = 3
+    Strident = 4
+    Sibilant = 5
+    Obstruent = 6
+    Fricative = 7
+    Continuant = 8
+    Vocoid = 9
+    Vowel = 10
+    Approximant = 11
+    Semivowel = 12
+    Rhotic = 13
+    Lateral = 14
+    Liquid = 15
+    Vibrant = 16
+    Flap = 17
+    Trill = 18
 
-    @lazy
-    def get_manner(self, consonant: str):
-        return ""
-
-class Vowel(NamedTuple):
+@dataclass
+class Vowel():
     formant1: int
     formant2: int
 
-class Consonant(NamedTuple):
+@dataclass
+class Consonant():
+    phoneme: str # Phoneme.phoneme
     place: int # Phoneme.Place
     manner: int # Phoneme.Manner
     voiced: bool # Phoneme.Voiced
 
 class Phoneme():
-    def __init__(self, phoneme: str):
+    def __init__(self, phoneme):
         self.allophone = phoneme
-        self.phoneme = self.set_vowel() if self.is_vowel() else self.set_consonant()
 
-    def is_vowel(self):
+    def is_vowel(self) -> bool:
+        """ Checks if phoneme is a vowel """
         return self.allophone in VOWELS
 
-    def build_phoneme_feature(self):
-        pass
+    @staticmethod
+    def build_phoneme_feature(manners: list) -> list:
+        """ """
+        embedded_manners = [0] * len(Manner)
+        for manner in manners:
+            embedded_manners[manner.value] = 1
+        return embedded_manners
 
-    @lazy
-    def set_consonant(self, place, voiced):
-        Consonant(place, voiced)
-        return self.phoneme
+    # @lazy
+    def set_consonant(self, place: int, manners: list, voiced: bool):
+        embedded_manners = Phoneme.build_phoneme_feature(manners)
+        return Consonant(self.allophone, place, embedded_manners, voiced)
 
-    @lazy
+    # @lazy
     def set_vowel(self):
-        return self.phoneme
-
-# do an enum on string for place
+        return VOWELS[self.allophone]
 
 # A mapping of vowel to F1,  F2
 VOWELS = {
@@ -101,40 +106,56 @@ VOWELS = {
 }
 
 CONSONANTS = {
-    "p" : Consonant(Place.Bilabial, Manner.get_manner, False),
-    "b" : Consonant(Place.Bilabial, Manner.get_manner, True),
-    "m" : Consonant(Place.Bilabial, Manner.get_manner, True),
+    "p" : (Place.Bilabial, [Manner.Obstruent, Manner.Plosive, Manner.Occlusive], False),
+    "b" : (Place.Bilabial, [Manner.Obstruent, Manner.Plosive, Manner.Occlusive], True),
+    "m" : (Place.Bilabial, [Manner.Nasal, Manner.Occlusive], True),
 
-    "ʃ" : Consonant(Place.Alveolar, Manner.get_manner, False),
-    "ʒ" : Consonant(Place.Alveolar, Manner.get_manner, True),
-    "t" : Consonant(Place.Alveolar, Manner.get_manner, False),
-    "d" : Consonant(Place.Alveolar, Manner.get_manner, True),
-    "n" : Consonant(Place.Alveolar, Manner.get_manner, True),
-    "s" : Consonant(Place.Alveolar, Manner.get_manner, False),
-    "z" : Consonant(Place.Alveolar, Manner.get_manner, True),
-    "ɾ" : Consonant(Place.Alveolar, Manner.get_manner, False),
-    "ɹ" : Consonant(Place.Alveolar, Manner.get_manner, False),
-    "l" : Consonant(Place.Alveolar, Manner.get_manner, False),
+    "ʃ" : (Place.PostAlveolar, [Manner.Sibilant, Manner.Strident, Manner.Obstruent,
+                                Manner.Fricative, Manner.Continuant], False),
+    "ʒ" : (Place.PostAlveolar, [Manner.Sibilant, Manner.Strident, Manner.Obstruent,
+                                Manner.Fricative, Manner.Continuant], True),
 
-    "k" : Consonant(Place.Velar, Manner.Plosive, False),
-    "g" : Consonant(Place.Velar, Manner.Plosive, True),
-    "ŋ" : Consonant(Place.Velar, Manner.Nasal, False),
+    "t" : (Place.Alveolar, [Manner.Plosive, Manner.Obstruent, Manner.Occlusive], False),
+    "d" : (Place.Alveolar, [Manner.Plosive, Manner.Obstruent, Manner.Occlusive], True),
+    "n" : (Place.Alveolar, [Manner.Nasal, Manner.Occlusive], True),
 
+    "s" : (Place.Alveolar, [Manner.Sibilant, Manner.Strident, Manner.Obstruent,
+                            Manner.Fricative, Manner.Continuant], False),
+    "z" : (Place.Alveolar, [Manner.Sibilant, Manner.Strident, Manner.Obstruent,
+                            Manner.Fricative, Manner.Continuant], True),
 
-    "f" : Consonant(Place.Labial, Manner.Fricative, False),
-    "v" : Consonant(Place.Labial, Manner.Fricative, True),
+    "ɾ" : (Place.Alveolar, [Manner.Flap, Manner.Vibrant, Manner.Rhotic,
+                            Manner.Liquid], False),
 
-    "θ" : Consonant(Place.Dental, Manner.Fricative, False),
-    "ð" : Consonant(Place.Dental, Manner.Fricative, True),
+    "ɹ" : (Place.Alveolar, [Manner.Vocoid, Manner.Rhotic, Manner.Liquid,
+                            Manner.Approximant, Manner.Continuant], False),
+    "l" : (Place.Alveolar, [Manner.Lateral, Manner.Continuant, Manner.Approximant,
+                            Manner.Liquid, Manner.Vocoid], False),
 
-    "h" : Consonant(Place.Glottal, Manner.Fricative, False),
-    "ʔ" : Consonant(Place.Glottal, Manner.Plosive, False),
+    "k" : (Place.Velar, [Manner.Obstruent, Manner.Plosive, Manner.Occlusive], False),
+    "g" : (Place.Velar, [Manner.Obstruent, Manner.Plosive, Manner.Occlusive], True),
+    "ŋ" : (Place.Velar, [Manner.Nasal, Manner.Occlusive], False),
 
-    "w" : Consonant(Place.Velar, Manner.Approximant, True),
-    "j" : Consonant(Place.Palatal, Manner.Approximant, False),
+    "f" : (Place.Labial, [Manner.Strident, Manner.Obstruent, Manner.Fricative,
+                          Manner.Continuant], False),
+    "v" : (Place.Labial, [Manner.Strident, Manner.Obstruent, Manner.Fricative,
+                          Manner.Continuant], True),
 
-    "tʃ" : Consonant(Place.Alveolar, Manner.Affricate, False),
-    "dʒ" : Consonant(Place.Alveolar, Manner.Affricate, True),
+    "θ" : (Place.Dental, [Manner.Obstruent, Manner.Fricative, Manner.Continuant], False),
+    "ð" : (Place.Dental, [Manner.Obstruent, Manner.Fricative, Manner.Continuant], True),
+    #
+    "h" : (Place.Glottal, [Manner.Fricative, Manner.Continuant, Manner.Obstruent], False),
+    "ʔ" : (Place.Glottal, [Manner.Plosive, Manner.Occlusive, Manner.Obstruent], False),
+    #
+    "w" : (Place.Velar, [Manner.Approximant, Manner.Semivowel, Manner.Continuant,
+                         Manner.Vocoid], True),
+    "j" : (Place.Palatal, [Manner.Approximant, Manner.Semivowel, Manner.Continuant,
+                           Manner.Vocoid], True),
+    #
+    "tʃ" : (Place.Alveolar, [Manner.Affricate, Manner.Sibilant, Manner.Strident,
+                             Manner.Occlusive, Manner.Obstruent], False),
+    "dʒ" : (Place.Alveolar, [Manner.Affricate, Manner.Sibilant, Manner.Strident,
+                             Manner.Occlusive, Manner.Obstruent], True),
 }
 
 
@@ -155,5 +176,9 @@ def build_dimensional_features():
     """
     return 1
 
-consonantal_distance("d", "p")
+# consonantal_distance("d", "p")
 # print(vocalic_distance("o","ɛ"))
+
+x = Phoneme("p")
+y = x.set_consonant(*CONSONANTS["p"])
+print(repr(y.place))
