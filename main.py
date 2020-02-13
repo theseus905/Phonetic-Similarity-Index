@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from math import hypot
-from typing import NamedTuple
-from dataclasses import dataclass
-import numpy as np
+from typing import Type, NamedTuple
+# from dataclasses import dataclass
+# import numpy as np
 # from lazy import *
 
-
-# make a word class
 # has a syllabify function
 
 # Enumeration of
@@ -52,42 +50,58 @@ class Manner(Enum):
     Flap = 17
     Trill = 18
 
-@dataclass
-class Vowel():
-    formant1: int
-    formant2: int
-
-@dataclass
-class Consonant():
-    phoneme: str # Phoneme.phoneme
-    place: int # Phoneme.Place
-    manner: int # Phoneme.Manner
-    voiced: bool # Phoneme.Voiced
-
 class Phoneme():
-    def __init__(self, phoneme):
-        self.allophone = phoneme
+    def __init__(self, allophone):
+        self.allophone = allophone
 
     def is_vowel(self) -> bool:
-        """ Checks if phoneme is a vowel """
+        """ Checks if an allophone is a vowel """
         return self.allophone in VOWELS
 
+    # @lazy
+    def set_vowel(self):
+        return VOWELS[self.allophone]
+
+    def set_consonant(self, place: int, manners: list, voiced: bool):
+        embedded_manners = Consonant.embed_manners(manners)
+        return Consonant(self.allophone, place, embedded_manners, voiced)
+
+class Vowel(Phoneme):
+    def __init__(self, formant1, formant2):
+        self.formant1 = formant1
+        self.formant2 = formant2
+
+    def distance(self, vowel):
+        return hypot(self.formant1 - vowel.formant1,
+                     self.formant2 - vowel.formant2)
+
+
+# @dataclass
+class Consonant(Phoneme):
+    def __init__(self, phoneme: str, place: int, manners: list, voiced: bool):
+        self.phoneme = phoneme
+        self.place = place
+        self.manner = Consonant.embed_manners(manners)
+        self.voiced = voiced
+        self.packed = (self.phoneme, self.place, self.manner, self.voiced)
+
+    def __str__(self):
+        format_string = 'Phoneme: {}\n Place: {}\n Manners: {}\n Voiced: {}\n'
+        return format_string.format(*self.packed)
+
     @staticmethod
-    def build_phoneme_feature(manners: list) -> list:
+    def embed_manners(manners: list) -> list:
         """ """
         embedded_manners = [0] * len(Manner)
         for manner in manners:
             embedded_manners[manner.value] = 1
         return embedded_manners
 
-    # @lazy
-    def set_consonant(self, place: int, manners: list, voiced: bool):
-        embedded_manners = Phoneme.build_phoneme_feature(manners)
-        return Consonant(self.allophone, place, embedded_manners, voiced)
+    def distance(self, consonant: 'Consonant'):
+        print(self.place)
+        print(self.manner)
 
-    # @lazy
-    def set_vowel(self):
-        return VOWELS[self.allophone]
+
 
 # A mapping of vowel to F1,  F2
 VOWELS = {
@@ -158,27 +172,11 @@ CONSONANTS = {
                              Manner.Occlusive, Manner.Obstruent], True),
 }
 
-
-def vocalic_distance(vowel1: str, vowel2: str):
-    vowel1 = VOWELS[vowel1]
-    vowel2 = VOWELS[vowel2]
-    return hypot(vowel1.formant1 - vowel2.formant1,
-                 vowel1.formant2 - vowel2.formant2)
-
-def consonantal_distance(consonant1: str, consonant2: str):
-    print(repr(CONSONANTS[consonant1].place))
-    print(CONSONANTS[consonant1].manner)
-    print(CONSONANTS[consonant1].manner.value)
-
-def build_dimensional_features():
-    """
-    this is meant to build dimensional feature
-    """
-    return 1
-
 # consonantal_distance("d", "p")
 # print(vocalic_distance("o","ɛ"))
 
-x = Phoneme("p")
-y = x.set_consonant(*CONSONANTS["p"])
-print(repr(y.place))
+if __name__ == "__main__":
+    for word in "bkd":
+        phoneme = Phoneme(word)
+        allophone = Consonant(phoneme.allophone, *CONSONANTS[phoneme.allophone])
+        print(str(allophone))
